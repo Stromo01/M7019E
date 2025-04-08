@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
                     MainScreen("popular") //top_rated, popular
                 }
                 }
@@ -107,7 +107,10 @@ class MainActivity : ComponentActivity() {
                 model = "https://image.tmdb.org/t/p/w500${movie.poster_path}",
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .clickable {
+                        // Handle click event
+                    },
                 contentScale = ContentScale.Crop
             )
             Text(
@@ -122,12 +125,6 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    onClick = { /* Do something */ },
-                    modifier = Modifier.padding(10.dp)
-                ) {
-                    Text(text = "Info")
-                }
                 Text(
                     text = "${movie.rating}",
                     fontSize = 16.sp,
@@ -151,10 +148,11 @@ class MainActivity : ComponentActivity() {
     fun DefaultPreview() {
         M7019ETheme {
             val sampleMovies = listOf(
-                Movie(id = 1, title = "Sample Movie 1", overview = "", poster_path = "", rating = 0f),
-                Movie(id = 2, title = "Sample Movie 2", overview = "", poster_path = "", rating = 0f),
+                Movie(id = 1, title = "Sample Movie 1", overview = "", poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg", rating = 0f),
+                Movie(id = 2, title = "Sample Movie 2", overview = "", poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg", rating = 0f),
             )
-            DisplayMovies(movies = sampleMovies)
+            DisplayMovies(sampleMovies)
+            Banner("category")
         }
     }
 }
