@@ -7,10 +7,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -28,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.Coil
 import coil.compose.AsyncImage
 import com.example.m7019e.api.Movie
 import com.example.m7019e.api.getMovies
@@ -47,17 +49,38 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val movies = androidx.compose.runtime.mutableStateOf(listOf<Movie>())
-                    movies.value= getMovies()
-                    ListMovies(movies = movies.value)
+
+                    MainScreen("popular") //top_rated, popular
+                }
                 }
             }
+
+    }
+    @Composable
+    fun MainScreen(category: String) {
+        val movies = getMovies(category)
+        Box(modifier = Modifier.fillMaxSize()) {
+            DisplayMovies(movies = movies)
+            Banner(category)
         }
     }
 
+    @Composable
+    fun Banner(category: String) {
+        Text(
+            text = category.capitalize().replace("_", " "),
+            fontSize = 24.sp,
+            color = Color.White,
+            modifier = Modifier
+                .background(Color(0xFF2c2c2c))
+                .fillMaxWidth()
+                .padding(top = 45.dp, start = 32.dp, end = 24.dp, bottom = 15.dp),
+            textAlign = TextAlign.Left
+        )
+    }
 
     @Composable
-    fun ListMovies(movies: List<Movie>) {
+    fun DisplayMovies(movies: List<Movie>) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
@@ -99,25 +122,25 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-            Button(
-                onClick = { /* Do something */ },
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Text(text = "Info")
-            }
-            Text(
-                text = "${movie.rating}",
-                fontSize = 16.sp,
-                color = Color.Black,
-                textAlign = TextAlign.Center
-            )
-            Image(
-                painter = painterResource(id = R.drawable.star),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(24.dp),
-            )
+                Button(
+                    onClick = { /* Do something */ },
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    Text(text = "Info")
+                }
+                Text(
+                    text = "${movie.rating}",
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.star),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(24.dp),
+                )
         }
         }
 
@@ -131,7 +154,7 @@ class MainActivity : ComponentActivity() {
                 Movie(id = 1, title = "Sample Movie 1", overview = "", poster_path = "", rating = 0f),
                 Movie(id = 2, title = "Sample Movie 2", overview = "", poster_path = "", rating = 0f),
             )
-            ListMovies(movies = sampleMovies)
+            DisplayMovies(movies = sampleMovies)
         }
     }
 }

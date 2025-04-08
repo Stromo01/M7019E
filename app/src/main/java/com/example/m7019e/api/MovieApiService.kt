@@ -10,11 +10,11 @@ import java.io.IOException
 import org.json.JSONObject
 
 class MovieApiService {
-    suspend fun fetchTrendingMovies(): JSONArray {
+    suspend fun fetchTrendingMovies(category: String): JSONArray {
         val client = OkHttpClient()
         val api_key = "ccc6a0ec53372cf3a8056fa7c63d72ed"
         val request = Request.Builder()
-            .url("https://api.themoviedb.org/3/trending/movie/day?api_key=$api_key&language=en-US")
+            .url("https://api.themoviedb.org/3/movie/$category?api_key=$api_key&language=en-US")
             .build()
 
         return withContext(Dispatchers.IO) {
