@@ -21,9 +21,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -36,6 +43,8 @@ import coil.compose.AsyncImage
 import com.example.m7019e.api.Movie
 import com.example.m7019e.api.getMovies
 import com.example.m7019e.ui.theme.M7019ETheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 
 class MainActivity : ComponentActivity() {
@@ -50,33 +59,55 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen("popular") //top_rated, popular
-                }
+                    //MainScreen("popular") //top_rated, popular
+                    MainScreen()
                 }
             }
+        }
 
     }
+
     @Composable
-    fun MainScreen(category: String) {
+    fun MainScreen() {
+        var category by remember { mutableStateOf("popular") }
         val movies = getMovies(category)
-        Box(modifier = Modifier.fillMaxSize()) {
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            Banner(
+                currentCategory = category,
+                onCategorySelected = { selectedCategory ->
+                    category = selectedCategory
+                }
+            )
             DisplayMovies(movies = movies)
-            Banner(category)
         }
     }
 
     @Composable
-    fun Banner(category: String) {
-        Text(
-            text = category.capitalize().replace("_", " "),
-            fontSize = 24.sp,
-            color = Color.White,
+    fun Banner(
+        currentCategory: String,
+        onCategorySelected: (String) -> Unit
+    ) {
+        Row(
             modifier = Modifier
                 .background(Color(0xFF2c2c2c))
                 .fillMaxWidth()
                 .padding(top = 45.dp, start = 32.dp, end = 24.dp, bottom = 15.dp),
-            textAlign = TextAlign.Left
-        )
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            listOf("popular", "top_rated").forEach { category ->
+                Text(
+                    text = category.capitalize().replace("_", " "),
+                    fontSize = 20.sp,
+                    color = if (currentCategory == category) Color.Yellow else Color.White,
+                    modifier = Modifier
+                        .clickable { onCategorySelected(category) }
+                        .padding(8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 
     @Composable
@@ -138,7 +169,7 @@ class MainActivity : ComponentActivity() {
                         .padding(8.dp)
                         .size(24.dp),
                 )
-        }
+            }
         }
 
     }
@@ -148,11 +179,26 @@ class MainActivity : ComponentActivity() {
     fun DefaultPreview() {
         M7019ETheme {
             val sampleMovies = listOf(
-                Movie(id = 1, title = "Sample Movie 1", overview = "", poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg", rating = 0f),
-                Movie(id = 2, title = "Sample Movie 2", overview = "", poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg", rating = 0f),
+                Movie(
+                    id = 1,
+                    title = "Sample Movie 1",
+                    overview = "",
+                    poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
+                    rating = 0f
+                ),
+                Movie(
+                    id = 2,
+                    title = "Sample Movie 2",
+                    overview = "",
+                    poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
+                    rating = 0f
+                ),
             )
             DisplayMovies(sampleMovies)
-            Banner("category")
+            Banner(
+                currentCategory = "popular",
+                onCategorySelected = { /* Placeholder for preview */ }
+            )
         }
     }
 }
