@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -45,41 +47,76 @@ import com.example.m7019e.api.getMovies
 import com.example.m7019e.ui.theme.M7019ETheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
+
+
 
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
         setContent {
+            val movieViewModel: MovieViewModel = viewModel()
+            val navController = rememberNavController()
+
             M7019ETheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    //MainScreen("popular") //top_rated, popular
-                    MainScreen()
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    NavHost(navController = navController, startDestination = "main") {
+                        composable("main") {
+                            MainScreen(navController, movieViewModel)
+                        }
+                        composable("movie_detail") {
+                            MovieDetailScreen(movieViewModel)
+                        }
+                    }
                 }
             }
         }
-
     }
 
+ // @Composable
+ // fun AppNavigator(movieViewModel: MovieViewModel) {
+ //     val navController = rememberNavController()
+
+ //     NavHost(navController = navController, startDestination = "main_screen") {
+ //         composable("main_screen") {
+ //             MovieDetailScreen(movieViewModel)
+ //         }
+ //         composable(
+ //             "movie_detail/{movieTitle}",
+ //             arguments = listOf(navArgument("movieTitle") { type = NavType.StringType })
+ //         ) { backStackEntry ->
+ //             val movieTitle = backStackEntry.arguments?.getString("movieTitle") ?: ""
+ //             MovieDetailScreen(movie Movie,movieTitle)
+ //         }
+ //     }
+ // }
+
+
     @Composable
-    fun MainScreen() {
+    fun MainScreen(navController: NavHostController, viewModel: MovieViewModel) {
         var category by remember { mutableStateOf("popular") }
         val movies = getMovies(category)
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Banner(
-                currentCategory = category,
-                onCategorySelected = { selectedCategory ->
-                    category = selectedCategory
-                }
-            )
-            DisplayMovies(movies = movies)
+            Banner(currentCategory = category) { selected ->
+                category = selected
+            }
+            DisplayMovies(movies, navController, viewModel)
         }
     }
 
@@ -111,7 +148,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun DisplayMovies(movies: List<Movie>) {
+    fun DisplayMovies( movies: List<Movie>,
+                       navController: NavController,
+                       viewModel: MovieViewModel) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
@@ -120,17 +159,21 @@ class MainActivity : ComponentActivity() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(movies) { movie ->
-                MovieItem(movie = movie)
+                MovieItem(movie, navController, viewModel)
             }
         }
     }
 
     @Composable
-    fun MovieItem(movie: Movie) {
+    fun MovieItem(movie: Movie, navController: NavController, viewModel: MovieViewModel) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(8.dp).clickable {
+                    viewModel.selectedMovie = movie
+                    navController.navigate("movie_detail")
+                }
                 .fillMaxSize(),
+
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -138,10 +181,8 @@ class MainActivity : ComponentActivity() {
                 model = "https://image.tmdb.org/t/p/w500${movie.poster_path}",
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        // Handle click event
-                    },
+                    .height(250.dp)
+                    .fillMaxWidth(),
                 contentScale = ContentScale.Crop
             )
             Text(
@@ -173,10 +214,41 @@ class MainActivity : ComponentActivity() {
         }
 
     }
+    @Composable
+    fun MovieDetailScreen(viewModel: MovieViewModel) {
+        val movie = viewModel.selectedMovie
+
+        movie?.let {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = it.title, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+                AsyncImage(
+                    model = "https://image.tmdb.org/t/p/w500${it.poster_path}",
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(300.dp)
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = it.overview,
+                    fontSize = 16.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+    }
 
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
+        val movieViewModel: MovieViewModel = viewModel()
         M7019ETheme {
             val sampleMovies = listOf(
                 Movie(
@@ -194,7 +266,7 @@ class MainActivity : ComponentActivity() {
                     rating = 0f
                 ),
             )
-            DisplayMovies(sampleMovies)
+            DisplayMovies(sampleMovies, rememberNavController(),movieViewModel)
             Banner(
                 currentCategory = "popular",
                 onCategorySelected = { /* Placeholder for preview */ }
