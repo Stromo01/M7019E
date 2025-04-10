@@ -110,10 +110,11 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainScreen(navController: NavHostController, viewModel: MovieViewModel) {
         var category by remember { mutableStateOf("popular") }
-        val movies = getMovies(category)
+        val movies = getMovies(category)    // Gets the cattegory selected from the banner
+                                            // and fetches the movies to that category.
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Banner(currentCategory = category) { selected ->
+            Banner(currentCategory = category) { selected ->    // Gets the selected category
                 category = selected
             }
             DisplayMovies(movies, navController, viewModel)
@@ -125,7 +126,7 @@ class MainActivity : ComponentActivity() {
         currentCategory: String,
         onCategorySelected: (String) -> Unit
     ) {
-        Row(
+        Row( // Banner div design
             modifier = Modifier
                 .background(Color(0xFF2c2c2c))
                 .fillMaxWidth()
@@ -133,14 +134,16 @@ class MainActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            listOf("popular", "top_rated").forEach { category ->
-                Text(
+            listOf("popular", "top_rated", "favorites").forEach { category ->
+                Text( // Category text design and color
                     text = category.capitalize().replace("_", " "),
                     fontSize = 20.sp,
-                    color = if (currentCategory == category) Color.Yellow else Color.White,
-                    modifier = Modifier
-                        .clickable { onCategorySelected(category) }
-                        .padding(8.dp),
+                    color = if (currentCategory == category) { // Text color
+                        Color.Yellow
+                    } else {
+                        Color.White
+                    },
+                    modifier = Modifier.clickable { onCategorySelected(category) }.padding(8.dp), // Text design
                     textAlign = TextAlign.Center
                 )
             }
