@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.m7019e.api.Movie
-import com.example.m7019e.api.getMovies
 import com.example.m7019e.ui.theme.M7019ETheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -57,20 +56,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.m7019e.api.getFavoriteMovies
 import com.example.m7019e.FavoriteMovieHandler
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
+import androidx.compose.ui.platform.LocalContext
+import com.example.m7019e.api.MovieResponse
 
 
 class MainActivity : ComponentActivity() {
 
-    private val favMovie = FavoriteMovieHandler()
+    private lateinit var favMovie: FavoriteMovieHandler
+    private val movieRespone = MovieResponse()
     @SuppressLint("UnrememberedMutableState")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        favMovie = FavoriteMovieHandler(this)
         enableEdgeToEdge()
         setContent {
             val movieViewModel: MovieViewModel = viewModel()
@@ -113,10 +114,11 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainScreen(navController: NavHostController, viewModel: MovieViewModel) {
         var category by remember { mutableStateOf("popular") }
+
         val movies: List<Movie> = if (category == "favorites") {
-            getFavoriteMovies(favMovie.getFavoriteMovieIds()) // Fetches favorite movies using the IDs
+            movieRespone.getFavoriteMovies(favMovie.getFavoriteMovieIds()) // Fetches favorite movies using the IDs
         } else {
-            getMovies(category) // Fetches movies based on the selected category
+            movieRespone.getMovies(category) // Fetches movies based on the selected category
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
@@ -253,7 +255,7 @@ class MainActivity : ComponentActivity() {
                     color = Color.DarkGray
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                val isFavorite = remember { mutableStateOf(FavoriteMovieHandler().isFavorite(it.id.toString())) }
+                val isFavorite = remember { mutableStateOf(favMovie.isFavorite(it.id.toString())) }
                 IconButton(
                     onClick = {
                         isFavorite.value = !isFavorite.value

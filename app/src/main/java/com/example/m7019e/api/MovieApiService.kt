@@ -10,11 +10,12 @@ import java.io.IOException
 import org.json.JSONObject
 
 class MovieApiService {
+    val client = OkHttpClient()
+    val apiKey = "ccc6a0ec53372cf3a8056fa7c63d72ed"
+
     suspend fun fetchTrendingMovies(category: String): JSONArray {
-        val client = OkHttpClient()
-        val api_key = "ccc6a0ec53372cf3a8056fa7c63d72ed"
         val request = Request.Builder()
-            .url("https://api.themoviedb.org/3/movie/$category?api_key=$api_key&language=en-US")
+            .url("https://api.themoviedb.org/3/movie/$category?api_key=$apiKey&language=en-US")
             .build()
 
         return withContext(Dispatchers.IO) {
@@ -27,16 +28,13 @@ class MovieApiService {
     }
 
     suspend fun fetchMoviesById(ids: List<String>): JSONArray {
-        val client = OkHttpClient()
-        val apiKey = "ccc6a0ec53372cf3a8056fa7c63d72ed"
         val results = JSONArray()
-
         withContext(Dispatchers.IO) {
             ids.forEach { id ->
                 val request = Request.Builder()
-                    .url("https://api.themoviedb.org/3/find/$id?external_source=imdb_id&api_key=$apiKey")
+                    .url("https://api.themoviedb.org/3/movie/$id?language=en-US&Authorization=$apiKey")
                     .build()
-
+                Log.d("fetchMoviesById", "https://api.themoviedb.org/3/movie/$id?language=en-US&Authorization=$apiKey")
                 try {
                     client.newCall(request).execute().use { response ->
                         if (response.isSuccessful) {
@@ -48,7 +46,8 @@ class MovieApiService {
                                 Log.d("fetchMoviesById", "No movie results found for ID: $id")
                             }
                         } else {
-                            Log.e("fetchMoviesById", "Failed to fetch movie for ID: $id")
+                            Log.e("fetchMoviesById", "Failed to fetch movie for ID: $id" +
+                                    " - Response code: ${response.code}")
                         }
                     }
                 } catch (e: IOException) {
