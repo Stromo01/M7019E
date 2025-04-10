@@ -59,6 +59,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.m7019e.api.getFavoriteMovies
 import com.example.m7019e.FavoriteMovieHandler
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 
 
 class MainActivity : ComponentActivity() {
@@ -211,12 +213,13 @@ class MainActivity : ComponentActivity() {
                     color = Color.Black,
                     textAlign = TextAlign.Center
                 )
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.star),
                     contentDescription = null,
+                    tint = Color.Yellow,
                     modifier = Modifier
                         .padding(8.dp)
-                        .size(24.dp),
+                        .size(24.dp)
                 )
             }
         }
@@ -230,7 +233,7 @@ class MainActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = it.title, fontSize = 28.sp, fontWeight = FontWeight.Bold)
@@ -249,6 +252,28 @@ class MainActivity : ComponentActivity() {
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+                val isFavorite = remember { mutableStateOf(FavoriteMovieHandler().isFavorite(it.id.toString())) }
+                IconButton(
+                    onClick = {
+                        isFavorite.value = !isFavorite.value
+                        if (isFavorite.value) {
+                            favMovie.addFavoriteMovie(it.id.toString())
+                        } else {
+                            favMovie.removeFavoriteMovie(it.id.toString())
+                        }
+                    },
+                    modifier = Modifier
+                        .size(64.dp) // Increase the size of the IconButton
+                        .padding(2.dp) // Add padding to prevent clipping
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.heart),
+                        contentDescription = null,
+                        tint = if (isFavorite.value) Color.Red else Color.Gray,
+                        modifier = Modifier.size(48.dp) // Ensure the Icon is smaller than the IconButton
+                    )
+                }
             }
         }
     }

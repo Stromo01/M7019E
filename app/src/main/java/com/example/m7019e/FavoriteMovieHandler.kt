@@ -29,4 +29,8 @@ class FavoriteMovieHandler {
     fun getFavoriteMovieIds(): List<String> {
         return movieIds
     }
+
+    fun isFavorite(movieId: String): Boolean {
+        return movieIds.contains(movieId)
+    }
 }
