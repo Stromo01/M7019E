@@ -32,3 +32,23 @@ fun getMovies(category: String): List<Movie>  {
     }
     return results
 }
+fun getFavoriteMovies(idList: List<String>): List<Movie> { // returns a list of favorite movies and info
+    Log.d("getMovies", "Fetching movies")
+    val movieApiService = MovieApiService()
+    val results = mutableListOf<Movie>()
+    val response = runBlocking {
+        movieApiService.fetchMoviesById(idList)
+    }
+    for (i in 0 until response.length()) {
+        val movieJson = response.getJSONObject(i)
+        val movie = Movie(
+            id = movieJson.getInt("id"),
+            title = movieJson.getString("title"),
+            overview = movieJson.getString("overview"),
+            poster_path = movieJson.getString("poster_path"),
+            rating = "%.1f".format(movieJson.getDouble("vote_average")).toFloat()
+        )
+        results.add(movie)
+    }
+    return results
+}

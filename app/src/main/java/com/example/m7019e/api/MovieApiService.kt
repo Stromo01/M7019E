@@ -25,4 +25,38 @@ class MovieApiService {
             }
         }
     }
+
+    suspend fun fetchMoviesById(ids: List<String>): JSONArray {
+        val client = OkHttpClient()
+        val apiKey = "ccc6a0ec53372cf3a8056fa7c63d72ed"
+        val results = JSONArray()
+
+        withContext(Dispatchers.IO) {
+            ids.forEach { id ->
+                val request = Request.Builder()
+                    .url("https://api.themoviedb.org/3/find/$id?external_source=imdb_id&api_key=$apiKey")
+                    .build()
+
+                try {
+                    client.newCall(request).execute().use { response ->
+                        if (response.isSuccessful) {
+                            val jsonResponse = JSONObject(response.body?.string())
+                            val movie = jsonResponse.getJSONArray("movie_results")
+                            if (movie.length() > 0) {
+                                results.put(movie.getJSONObject(0)) // Add the first movie result
+                            } else {
+                                Log.d("fetchMoviesById", "No movie results found for ID: $id")
+                            }
+                        } else {
+                            Log.e("fetchMoviesById", "Failed to fetch movie for ID: $id")
+                        }
+                    }
+                } catch (e: IOException) {
+                    Log.e("fetchMoviesById", "Error fetching movie for ID: $id", e)
+                }
+            }
+        }
+
+        return results
+    }
 }

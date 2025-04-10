@@ -57,12 +57,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-
-
-
+import com.example.m7019e.api.getFavoriteMovies
+import com.example.m7019e.FavoriteMovieHandler
 
 
 class MainActivity : ComponentActivity() {
+
+    private val favMovie = FavoriteMovieHandler()
     @SuppressLint("UnrememberedMutableState")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,38 +111,20 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainScreen(navController: NavHostController, viewModel: MovieViewModel) {
         var category by remember { mutableStateOf("popular") }
-        val movies = getMovies(category)    // Gets the cattegory selected from the banner
-                                            // and fetches the movies to that category.
+        val movies: List<Movie> = if (category == "favorites") {
+            getFavoriteMovies(favMovie.getFavoriteMovieIds()) // Fetches favorite movies using the IDs
+        } else {
+            getMovies(category) // Fetches movies based on the selected category
+        }
 
         Column(modifier = Modifier.fillMaxSize()) {
             Banner(currentCategory = category) { selected ->    // Gets the selected category
                 category = selected
             }
-            if (category != "favorites") {
-                DisplayMovies(movies, navController, viewModel)
-            }
-            else {
-                //val favMovies = getFavMovies() // Fetches the favorite movies
-                val favMovies = null
-                if (favMovies == null) {
-                    Text(
-                        text = "No favorite movies yet",
-                        fontSize = 24.sp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                else{
-                    //DisplayMovies(favMovies, navController, viewModel) // Displays the favorite movies
-                }
-
-            }
-
+            DisplayMovies(movies, navController, viewModel)
         }
     }
+
 
     @Composable
     fun Banner(
