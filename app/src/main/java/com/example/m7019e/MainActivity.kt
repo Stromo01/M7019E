@@ -117,7 +117,29 @@ class MainActivity : ComponentActivity() {
             Banner(currentCategory = category) { selected ->    // Gets the selected category
                 category = selected
             }
-            DisplayMovies(movies, navController, viewModel)
+            if (category != "favorites") {
+                DisplayMovies(movies, navController, viewModel)
+            }
+            else {
+                //val favMovies = getFavMovies() // Fetches the favorite movies
+                val favMovies = null
+                if (favMovies == null) {
+                    Text(
+                        text = "No favorite movies yet",
+                        fontSize = 24.sp,
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else{
+                    //DisplayMovies(favMovies, navController, viewModel) // Displays the favorite movies
+                }
+
+            }
+
         }
     }
 

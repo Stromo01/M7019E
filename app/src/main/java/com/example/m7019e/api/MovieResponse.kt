@@ -17,12 +17,7 @@ fun getMovies(category: String): List<Movie>  {
     val movieApiService = MovieApiService()
     val results = mutableListOf<Movie>()
     val response = runBlocking {
-        if (category != "favorites") {
-            movieApiService.fetchTrendingMovies(category)
-        }
-        else {
-            movieApiService.fetchTrendingMovies("popular")// Add favorites logic here change this line
-        }
+        movieApiService.fetchTrendingMovies(category)
     }
     for (i in 0 until response.length()) {
         val movieJson = response.getJSONObject(i)
