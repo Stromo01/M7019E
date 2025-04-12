@@ -1,8 +1,11 @@
 package com.example.m7019e
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -229,7 +232,7 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun MovieDetailScreen(viewModel: MovieViewModel) {
-        val movie = viewModel.selectedMovie
+        val movie = viewModel.selectedMovie?.let { movieRespone.getMovieDetails(it) }
 
         movie?.let {
             Column(
@@ -276,6 +279,43 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.size(48.dp) // Ensure the Icon is smaller than the IconButton
                     )
                 }
+                Row(){
+                    val context = LocalContext.current
+                    Button(
+                        onClick = {
+                            if (it.homepage.isNotEmpty()) {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.homepage))
+                                val chooser = Intent.createChooser(intent, "Open with")
+                                context.startActivity(chooser)
+                            }
+                            else{
+                                Toast.makeText(context, "No homepage available", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Homepage", fontSize = 16.sp)
+                    }
+                    Button(
+                        onClick = {
+                            if (it.imdbid.isNotEmpty()) {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.imdb.com/title/${it.imdbid}"))
+                                val chooser = Intent.createChooser(intent, "Open with")
+                                context.startActivity(chooser)
+                            }
+                            else{
+                                Toast.makeText(context, "No IMDB page available", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .height(50.dp)
+                    ) {
+                        Text(text = "IMDB", fontSize = 16.sp)
+                    }
+                }
             }
         }
     }
@@ -291,14 +331,18 @@ class MainActivity : ComponentActivity() {
                     title = "Sample Movie 1",
                     overview = "",
                     poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
-                    rating = 0f
+                    rating = 0f,
+                    homepage = "",
+                    imdbid = ""
                 ),
                 Movie(
                     id = 2,
                     title = "Sample Movie 2",
                     overview = "",
                     poster_path = "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
-                    rating = 0f
+                    rating = 0f,
+                    homepage = "",
+                    imdbid = ""
                 ),
             )
             DisplayMovies(sampleMovies, rememberNavController(),movieViewModel)

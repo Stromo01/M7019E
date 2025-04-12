@@ -32,16 +32,16 @@ class MovieApiService {
         withContext(Dispatchers.IO) {
             ids.forEach { id ->
                 val request = Request.Builder()
-                    .url("https://api.themoviedb.org/3/movie/$id?language=en-US&Authorization=$apiKey")
+                    .url("https://api.themoviedb.org/3/movie/$id?api_key=$apiKey&language=en-US")
                     .build()
-                Log.d("fetchMoviesById", "https://api.themoviedb.org/3/movie/$id?language=en-US&Authorization=$apiKey")
+                Log.d("fetchMoviesById", "https://api.themoviedb.org/3/movie/$id?api_key=$apiKey&language=en-US")
                 try {
                     client.newCall(request).execute().use { response ->
                         if (response.isSuccessful) {
                             val jsonResponse = JSONObject(response.body?.string())
-                            val movie = jsonResponse.getJSONArray("movie_results")
+                            val movie = jsonResponse
                             if (movie.length() > 0) {
-                                results.put(movie.getJSONObject(0)) // Add the first movie result
+                                results.put(movie) // Add the first movie result
                             } else {
                                 Log.d("fetchMoviesById", "No movie results found for ID: $id")
                             }
@@ -55,7 +55,6 @@ class MovieApiService {
                 }
             }
         }
-
         return results
     }
 }
