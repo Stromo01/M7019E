@@ -63,6 +63,7 @@ import com.example.m7019e.FavoriteMovieHandler
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import com.example.m7019e.api.MovieResponse
 
 
@@ -228,7 +229,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-
+//
     }
     @Composable
     fun MovieDetailScreen(viewModel: MovieViewModel) {
@@ -253,9 +254,20 @@ class MainActivity : ComponentActivity() {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
+                    text = it.genre_names,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
                     text = it.overview,
                     fontSize = 16.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,
+
+
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 val isFavorite = remember { mutableStateOf(favMovie.isFavorite(it.id.toString())) }
@@ -278,7 +290,10 @@ class MainActivity : ComponentActivity() {
                         tint = if (isFavorite.value) Color.Red else Color.Gray,
                         modifier = Modifier.size(48.dp) // Ensure the Icon is smaller than the IconButton
                     )
+
+
                 }
+
                 Row(){
                     val context = LocalContext.current
                     Button(

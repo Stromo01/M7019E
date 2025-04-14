@@ -26,6 +26,19 @@ class MovieApiService {
             }
         }
     }
+    suspend fun fetchGenres(): JSONArray {
+        val request = Request.Builder()
+            .url("https://api.themoviedb.org/3/genre/movie/list?api_key=$apiKey&language=en-US")
+            .build()
+
+        return withContext(Dispatchers.IO) {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                val jsonResponse = JSONObject(response.body?.string())
+                jsonResponse.getJSONArray("genres")
+            }
+        }
+    }
 
     suspend fun fetchMoviesById(ids: List<String>): JSONArray {
         val results = JSONArray()
