@@ -284,7 +284,10 @@ class MainActivity : ComponentActivity() {
                     Button(
                         onClick = {
                             if (it.homepage.isNotEmpty()) {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.homepage))
+                                val uri = Uri.parse(it.homepage)
+                                val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+                                    addCategory(Intent.CATEGORY_BROWSABLE)
+                                }
                                 val chooser = Intent.createChooser(intent, "Open with")
                                 context.startActivity(chooser)
                             }
