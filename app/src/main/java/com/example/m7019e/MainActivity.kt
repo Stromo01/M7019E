@@ -65,6 +65,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import com.example.m7019e.api.MovieResponse
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
+
+
 
 
 class MainActivity : ComponentActivity() {
@@ -236,6 +241,7 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun MovieDetailScreen(navController: NavController, viewModel: MovieViewModel) {
+        val context = LocalContext.current
         val movie = viewModel.selectedMovie?.let { movieRespone.getMovieDetails(it) }
 
         movie?.let {
@@ -262,17 +268,16 @@ class MainActivity : ComponentActivity() {
                     fontStyle = FontStyle.Italic,
                     fontSize = 16.sp,
                     color = Color.Black,
-
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = it.overview,
                     fontSize = 16.sp,
                     color = Color.DarkGray,
-
-
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Heart Icon
                 val isFavorite = remember { mutableStateOf(favMovie.isFavorite(it.id.toString())) }
                 IconButton(
                     onClick = {
@@ -284,21 +289,23 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     modifier = Modifier
-                        .size(64.dp) // Increase the size of the IconButton
-                        .padding(2.dp) // Add padding to prevent clipping
+                        .size(64.dp)
+                        .padding(2.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.heart),
                         contentDescription = null,
                         tint = if (isFavorite.value) Color.Red else Color.Gray,
-                        modifier = Modifier.size(48.dp) // Ensure the Icon is smaller than the IconButton
+                        modifier = Modifier.size(48.dp)
                     )
-
-
                 }
 
-                Row(){
-                    val context = LocalContext.current
+                Spacer(modifier = Modifier.weight(1f)) // Pushes the buttons to the bottom
+
+                // Buttons Column with Dividers
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Button(
                         onClick = {
                             if (it.homepage.isNotEmpty()) {
@@ -308,45 +315,58 @@ class MainActivity : ComponentActivity() {
                                 }
                                 val chooser = Intent.createChooser(intent, "Open with")
                                 context.startActivity(chooser)
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(context, "No homepage available", Toast.LENGTH_SHORT).show()
                             }
                         },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFf5c518),
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(0.dp),
                         modifier = Modifier
-                            .padding(8.dp)
+                            .fillMaxWidth()
                             .height(50.dp)
                     ) {
                         Text(text = "Homepage", fontSize = 16.sp)
                     }
+                    Divider(color = Color.Black, thickness = 1.dp)
                     Button(
                         onClick = {
                             if (it.imdbid.isNotEmpty()) {
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.imdb.com/title/${it.imdbid}"))
                                 val chooser = Intent.createChooser(intent, "Open with")
                                 context.startActivity(chooser)
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(context, "No IMDB page available", Toast.LENGTH_SHORT).show()
                             }
                         },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFf5c518),
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(0.dp),
                         modifier = Modifier
-                            .padding(8.dp)
+                            .fillMaxWidth()
                             .height(50.dp)
                     ) {
                         Text(text = "IMDB", fontSize = 16.sp)
                     }
-                }
-                Row(){
+                    Divider(color = Color.Black, thickness = 1.dp)
                     Button(
                         onClick = {
-                            navController.navigate("review") // Navigate to the Review screen
+                            navController.navigate("review")
                         },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFf5c518),
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(0.dp),
                         modifier = Modifier
-                            .padding(8.dp)
+                            .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text="Review", fontSize = 16.sp)
+                        Text(text = "Review", fontSize = 16.sp)
                     }
                 }
             }
