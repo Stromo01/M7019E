@@ -88,7 +88,10 @@ class MainActivity : ComponentActivity() {
                             MainScreen(navController, movieViewModel)
                         }
                         composable("movie_detail") {
-                            MovieDetailScreen(movieViewModel)
+                            MovieDetailScreen(navController, movieViewModel)
+                        }
+                        composable("review") {
+                            ReviewScreen()
                         }
                     }
                 }
@@ -232,7 +235,7 @@ class MainActivity : ComponentActivity() {
 //
     }
     @Composable
-    fun MovieDetailScreen(viewModel: MovieViewModel) {
+    fun MovieDetailScreen(navController: NavController, viewModel: MovieViewModel) {
         val movie = viewModel.selectedMovie?.let { movieRespone.getMovieDetails(it) }
 
         movie?.let {
@@ -334,7 +337,32 @@ class MainActivity : ComponentActivity() {
                         Text(text = "IMDB", fontSize = 16.sp)
                     }
                 }
+                Row(){
+                    Button(
+                        onClick = {
+                            navController.navigate("review") // Navigate to the Review screen
+                        },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .height(50.dp)
+                    ) {
+                        Text(text="Review", fontSize = 16.sp)
+                    }
+                }
             }
+        }
+    }
+
+    @Composable
+    fun ReviewScreen() {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Review Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
     }
 
