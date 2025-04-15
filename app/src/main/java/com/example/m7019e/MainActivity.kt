@@ -260,9 +260,9 @@ class MainActivity : ComponentActivity() {
                     model = "https://image.tmdb.org/t/p/w500${it.poster_path}",
                     contentDescription = null,
                     modifier = Modifier
-                        .height(300.dp)
+                        .height(400.dp)
                         .fillMaxWidth(),
-                    contentScale = ContentScale.Crop
+
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
