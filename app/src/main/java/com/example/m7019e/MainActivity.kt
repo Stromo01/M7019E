@@ -1,83 +1,27 @@
 package com.example.m7019e
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.material3.Surface
-import androidx.compose.ui.graphics.Color
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.m7019e.api.Movie
 import com.example.m7019e.ui.theme.M7019ETheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.m7019e.FavoriteMovieHandler
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Icon
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontStyle
 import com.example.m7019e.api.MovieResponse
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-
-
 
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var favMovie: FavoriteMovieHandler
-    private val movieRespone = MovieResponse()
+    private val movieResponse = MovieResponse()
     @SuppressLint("UnrememberedMutableState")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,10 +36,12 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     NavHost(navController = navController, startDestination = "main") {
                         composable("main") {
-                            MainScreen(navController, movieViewModel)
+                            MainScreen(navController, movieViewModel,
+                                movieResponse, favMovie)
                         }
                         composable("movie_detail") {
-                            MovieDetailScreen(navController, movieViewModel)
+                            MovieDetailScreen(navController, movieViewModel ,
+                                movieResponse, favMovie)
                         }
                         composable("review") {
                             ReviewScreen()
@@ -103,290 +49,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
- // @Composable
- // fun AppNavigator(movieViewModel: MovieViewModel) {
- //     val navController = rememberNavController()
-
- //     NavHost(navController = navController, startDestination = "main_screen") {
- //         composable("main_screen") {
- //             MovieDetailScreen(movieViewModel)
- //         }
- //         composable(
- //             "movie_detail/{movieTitle}",
- //             arguments = listOf(navArgument("movieTitle") { type = NavType.StringType })
- //         ) { backStackEntry ->
- //             val movieTitle = backStackEntry.arguments?.getString("movieTitle") ?: ""
- //             MovieDetailScreen(movie Movie,movieTitle)
- //         }
- //     }
- // }
-
-
-    @Composable
-    fun MainScreen(navController: NavHostController, viewModel: MovieViewModel) {
-        var category by remember { mutableStateOf("popular") }
-
-        val movies: List<Movie> = if (category == "favorites") {
-            movieRespone.getFavoriteMovies(favMovie.getFavoriteMovieIds()) // Fetches favorite movies using the IDs
-        } else {
-            movieRespone.getMovies(category) // Fetches movies based on the selected category
-        }
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            Banner(currentCategory = category) { selected ->    // Gets the selected category
-                category = selected
-            }
-            DisplayMovies(movies, navController, viewModel)
-        }
-    }
-
-
-    @Composable
-    fun Banner(
-        currentCategory: String,
-        onCategorySelected: (String) -> Unit
-    ) {
-        Row( // Banner div design
-            modifier = Modifier
-                .background(Color(0xFF2c2c2c))
-                .fillMaxWidth()
-                .padding(top = 45.dp, start = 32.dp, end = 24.dp, bottom = 15.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            listOf("popular", "top_rated", "favorites").forEach { category ->
-                Text( // Category text design and color
-                    text = category.capitalize().replace("_", " "),
-                    fontSize = 20.sp,
-                    color = if (currentCategory == category) { // Text color
-                        Color.Yellow
-                    } else {
-                        Color.White
-                    },
-                    modifier = Modifier.clickable { onCategorySelected(category) }.padding(8.dp), // Text design
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-
-    @Composable
-    fun DisplayMovies( movies: List<Movie>,
-                       navController: NavController,
-                       viewModel: MovieViewModel) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(movies) { movie ->
-                MovieItem(movie, navController, viewModel)
-            }
-        }
-    }
-
-    @Composable
-    fun MovieItem(movie: Movie, navController: NavController, viewModel: MovieViewModel) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp).clickable {
-                    viewModel.selectedMovie = movie
-                    navController.navigate("movie_detail")
-                }
-                .fillMaxSize(),
-
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            AsyncImage(
-                model = "https://image.tmdb.org/t/p/w500${movie.poster_path}",
-                contentDescription = null,
-                modifier = Modifier
-                    .height(250.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                text = movie.title,
-                fontSize = 24.sp,
-                color = Color.Black,
-                textAlign = TextAlign.Center
-            )
-            Row(
-                modifier = Modifier
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "${movie.rating}",
-                    fontSize = 16.sp,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.star),
-                    contentDescription = null,
-                    tint = Color.Yellow,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(24.dp)
-                )
-            }
-        }
-//
-    }
-    @Composable
-    fun MovieDetailScreen(navController: NavController, viewModel: MovieViewModel) {
-        val context = LocalContext.current
-        val movie = viewModel.selectedMovie?.let { movieRespone.getMovieDetails(it) }
-
-        movie?.let {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(40.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = it.title, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(16.dp))
-                AsyncImage(
-                    model = "https://image.tmdb.org/t/p/w500${it.poster_path}",
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(400.dp)
-                        .fillMaxWidth(),
-
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = it.genre_names,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 16.sp,
-                    color = Color.Black,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = it.overview,
-                    fontSize = 16.sp,
-                    color = Color.DarkGray,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Heart Icon
-                val isFavorite = remember { mutableStateOf(favMovie.isFavorite(it.id.toString())) }
-                IconButton(
-                    onClick = {
-                        isFavorite.value = !isFavorite.value
-                        if (isFavorite.value) {
-                            favMovie.addFavoriteMovie(it.id.toString())
-                        } else {
-                            favMovie.removeFavoriteMovie(it.id.toString())
-                        }
-                    },
-                    modifier = Modifier
-                        .size(64.dp)
-                        .padding(2.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.heart),
-                        contentDescription = null,
-                        tint = if (isFavorite.value) Color.Red else Color.Gray,
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f)) // Pushes the buttons to the bottom
-
-                // Buttons Column with Dividers
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Button(
-                        onClick = {
-                            if (it.homepage.isNotEmpty()) {
-                                val uri = Uri.parse(it.homepage)
-                                val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-                                    addCategory(Intent.CATEGORY_BROWSABLE)
-                                }
-                                val chooser = Intent.createChooser(intent, "Open with")
-                                context.startActivity(chooser)
-                            } else {
-                                Toast.makeText(context, "No homepage available", Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFf5c518),
-                            contentColor = Color.Black
-                        ),
-                        shape = RoundedCornerShape(0.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Homepage", fontSize = 16.sp)
-                    }
-                    Divider(color = Color.Black, thickness = 1.dp)
-                    Button(
-                        onClick = {
-                            if (it.imdbid.isNotEmpty()) {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.imdb.com/title/${it.imdbid}"))
-                                val chooser = Intent.createChooser(intent, "Open with")
-                                context.startActivity(chooser)
-                            } else {
-                                Toast.makeText(context, "No IMDB page available", Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFf5c518),
-                            contentColor = Color.Black
-                        ),
-                        shape = RoundedCornerShape(0.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "IMDB", fontSize = 16.sp)
-                    }
-                    Divider(color = Color.Black, thickness = 1.dp)
-                    Button(
-                        onClick = {
-                            navController.navigate("review")
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFf5c518),
-                            contentColor = Color.Black
-                        ),
-                        shape = RoundedCornerShape(0.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Review", fontSize = 16.sp)
-                    }
-                    Spacer(modifier = Modifier.height(32.dp))
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun ReviewScreen() {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Review Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
     }
 

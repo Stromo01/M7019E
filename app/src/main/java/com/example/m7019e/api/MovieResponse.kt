@@ -12,30 +12,11 @@ data class Movie(
     val rating: Float,
     val homepage : String = "",
     val imdbid : String = "",
-    val genre_ids: List<Int> = emptyList(),
     val genre_names: String = ""
 )
 
-class MovieResponse{
+class MovieResponse{ //Takes api response and converts it to a list of movies
     val movieApiService = MovieApiService()
-    private val genreMap = mutableMapOf<Int, String>()
-
-    init {
-        runBlocking {
-            loadGenres()
-        }
-    }
-    suspend fun loadGenres() {
-        val genres = movieApiService.fetchGenres()
-        for (i in 0 until genres.length()) {
-            val genre = genres.getJSONObject(i)
-            genreMap[genre.getInt("id")] = genre.getString("name")
-        }
-    }
-
-    fun genreIdsToNames(ids: List<Int>): String {
-        return ids.mapNotNull { genreMap[it] }.joinToString(", ")
-    }
 
 
     fun getMovies(category: String): List<Movie>  {
@@ -77,8 +58,6 @@ class MovieResponse{
     }
 
     private fun jsonToMovie(jsonObject: JSONObject): Movie {
-        val genreIdsJsonArray = jsonObject.optJSONArray("genre_ids")
-        val genreIds = mutableListOf<Int>()
         val genreNames = mutableListOf<String>()
 
         if (jsonObject.has("genres")) {
@@ -86,16 +65,7 @@ class MovieResponse{
             if (genresArray != null) {
                 for (i in 0 until genresArray.length()) {
                     val genre = genresArray.getJSONObject(i)
-                    genreIds.add(genre.getInt("id"))
                     genreNames.add(genre.getString("name"))
-                }
-            }
-        } else if (jsonObject.has("genre_ids")) {
-            // Case 2: List endpoint with genre IDs only
-            val idsArray = jsonObject.optJSONArray("genre_ids")
-            if (idsArray != null) {
-                for (i in 0 until idsArray.length()) {
-                    genreIds.add(idsArray.getInt(i))
                 }
             }
         }
@@ -106,10 +76,9 @@ class MovieResponse{
             overview = jsonObject.getString("overview"),
             poster_path = jsonObject.getString("poster_path"),
             rating = "%.1f".format(jsonObject.getDouble("vote_average")).toFloat(),
-            homepage = jsonObject.optString("homepage",""),
-            imdbid = jsonObject.optString("imdb_id",""),
-            genre_ids = genreIds,
-            genre_names = genreIdsToNames(genreIds)
+            homepage = jsonObject.optString("homepage", ""),
+            imdbid = jsonObject.optString("imdb_id", ""),
+            genre_names = genreNames.joinToString(", ")
         )
     }
 
