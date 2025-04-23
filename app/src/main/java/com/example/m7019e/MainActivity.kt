@@ -44,7 +44,8 @@ class MainActivity : ComponentActivity() {
                                 movieResponse, favMovie)
                         }
                         composable("review") {
-                            ReviewScreen()
+                            ReviewScreen(navController, movieViewModel ,
+                                movieResponse)
                         }
                     }
                 }
