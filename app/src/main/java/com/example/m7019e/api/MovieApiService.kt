@@ -56,4 +56,32 @@ class MovieApiService {
         }
         return results
     }
+
+    suspend fun fetchVideos(id: String): JSONArray {
+        val request = Request.Builder()
+            .url("https://api.themoviedb.org/3/movie/$id/videos?api_key=$apiKey&language=en-US")
+            .build()
+
+        return withContext(Dispatchers.IO) {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                val jsonResponse = JSONObject(response.body?.string())
+                jsonResponse.getJSONArray("results")
+            }
+        }
+    }
+
+    suspend fun fetchReviews(id: String): JSONArray {
+        val request = Request.Builder()
+            .url("https://api.themoviedb.org/3/movie/$id/reviews?api_key=$apiKey&language=en-US")
+            .build()
+
+        return withContext(Dispatchers.IO) {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                val jsonResponse = JSONObject(response.body?.string())
+                jsonResponse.getJSONArray("results")
+            }
+        }
+    }
 }

@@ -82,5 +82,28 @@ class MovieResponse{ //Takes api response and converts it to a list of movies
         )
     }
 
+    fun getVideos(movie: Movie): List<String> {
+        val results = mutableListOf<String>()
+        val response = runBlocking {
+            movieApiService.fetchVideos(movie.id.toString())
+        }
+        for (i in 0 until response.length()) {
+            val videoJson = response.getJSONObject(i)
+            results.add("https://youtu.be/"+videoJson.getString("key"))
+        }
+        return results
+    }
+    fun getReviews(movie: Movie): List<String> {
+        val results = mutableListOf<String>()
+        val response = runBlocking {
+            movieApiService.fetchReviews(movie.id.toString())
+        }
+        for (i in 0 until response.length()) {
+            val reviewJson = response.getJSONObject(i)
+            results.add(reviewJson.getString("content"))
+        }
+        return results
+    }
+
 }
 
