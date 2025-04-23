@@ -15,6 +15,14 @@ data class Movie(
     val genre_names: String = ""
 )
 
+data class Review(
+    val author: String,
+    val content: String,
+    val rating: Float,
+    val created_at: String
+
+)
+
 class MovieResponse{ //Takes api response and converts it to a list of movies
     val movieApiService = MovieApiService()
 
@@ -93,14 +101,21 @@ class MovieResponse{ //Takes api response and converts it to a list of movies
         }
         return results
     }
-    fun getReviews(movie: Movie): List<String> {
-        val results = mutableListOf<String>()
+    fun getReviews(movie: Movie): List<Review> {
+        val results = mutableListOf<Review>()
         val response = runBlocking {
             movieApiService.fetchReviews(movie.id.toString())
         }
         for (i in 0 until response.length()) {
             val reviewJson = response.getJSONObject(i)
-            results.add(reviewJson.getString("content"))
+            results.add(
+                Review(
+                    author = reviewJson.getString("author"),
+                    content = reviewJson.getString("content"),
+                    rating = "%.1f".format(reviewJson.getDouble("rating")).toFloat(),
+                    created_at = reviewJson.getString("created_at")
+                )
+            )
         }
         return results
     }
