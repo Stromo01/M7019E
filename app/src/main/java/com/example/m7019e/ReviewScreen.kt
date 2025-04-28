@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -55,6 +56,7 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
                  movieResponse: MovieResponse,) {
     val context = LocalContext.current
     val reviews = viewModel.selectedMovie?.let { movieResponse.getReviews(it) }
+    val videos = viewModel.selectedMovie?.let { movieResponse.getVideos(it) }
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState()),
@@ -70,12 +72,22 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
             }
 
         }
-        Row(
+        LazyRow(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(10.dp)
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
         ) {
-            ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+            item(){
+                videos?.forEach { video ->
+                    ExoPlayerView(video)
+                }
+            }
+
         }
     }
 }
@@ -136,12 +148,13 @@ fun ReviewItem(review: Review) {
 
 @Composable
 fun ExoPlayerView(uri: String) {
-
     // Get the current context
     val context = LocalContext.current
 
     // Initialize ExoPlayer
-    val exoPlayer = ExoPlayer.Builder(context).build()
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build()
+    }
 
     // Create a MediaSource
     val mediaSource = remember(uri) {
@@ -152,12 +165,13 @@ fun ExoPlayerView(uri: String) {
     LaunchedEffect(mediaSource) {
         exoPlayer.setMediaItem(mediaSource)
         exoPlayer.prepare()
+        exoPlayer.playWhenReady = true // Start playback automatically
     }
 
     // Manage lifecycle events
     DisposableEffect(Unit) {
         onDispose {
-            exoPlayer.release()
+            exoPlayer.release() // Release ExoPlayer when the Composable is removed
         }
     }
 
@@ -171,6 +185,7 @@ fun ExoPlayerView(uri: String) {
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp) // Set your desired height
+            .padding(start=16.dp)
     )
 }
 
