@@ -76,11 +76,6 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(10.dp)
-<<<<<<< Updated upstream
-=======
-
-
->>>>>>> Stashed changes
         ) {
             item(){
                 videos?.forEach { video ->

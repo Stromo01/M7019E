@@ -108,11 +108,16 @@ class MovieResponse{ //Takes api response and converts it to a list of movies
         }
         for (i in 0 until response.length()) {
             val reviewJson = response.getJSONObject(i)
+            val rating = if (reviewJson.getJSONObject("author_details").isNull("rating")) {
+                0.0f // Default value for null rating
+            } else {
+                "%.1f".format(reviewJson.getJSONObject("author_details").getDouble("rating")).toFloat()
+            }
             results.add(
                 Review(
                     author = reviewJson.getString("author"),
                     content = reviewJson.getString("content"),
-                    rating = "%.1f".format(reviewJson.getJSONObject("author_details").getDouble("rating")).toFloat(),
+                    rating = rating,
                     created_at = reviewJson.getString("created_at")
                 )
             )
