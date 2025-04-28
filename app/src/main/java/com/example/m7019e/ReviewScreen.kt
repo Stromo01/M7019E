@@ -75,13 +75,11 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
             }
 
         }
-        LazyRow(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(10.dp)
         ) {
-
-            item(){
                 videos?.take(5)?.forEach { video ->
                     Column(){
                         ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
@@ -93,7 +91,7 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
                         )
                     }
                 }
-            }
+            
 
 
         }
