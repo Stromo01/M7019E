@@ -20,7 +20,11 @@ data class Review(
     val content: String,
     val rating: Float,
     val created_at: String
+)
 
+data class Video(
+    val key: String,
+    val name: String
 )
 
 class MovieResponse{ //Takes api response and converts it to a list of movies
@@ -90,14 +94,18 @@ class MovieResponse{ //Takes api response and converts it to a list of movies
         )
     }
 
-    fun getVideos(movie: Movie): List<String> {
-        val results = mutableListOf<String>()
+    fun getVideos(movie: Movie): List<Video> {
+        val results = mutableListOf<Video>()
         val response = runBlocking {
             movieApiService.fetchVideos(movie.id.toString())
         }
         for (i in 0 until response.length()) {
             val videoJson = response.getJSONObject(i)
-            results.add("https://youtu.be/"+videoJson.getString("key"))
+            val video = Video(
+                key = videoJson.getString("key"),
+                name = videoJson.getString("name")
+            )
+            results.add(video)
         }
         return results
     }
