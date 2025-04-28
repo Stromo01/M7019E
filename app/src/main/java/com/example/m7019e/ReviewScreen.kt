@@ -10,6 +10,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -90,9 +92,8 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel, movieR
             ) { page ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().align(Alignment.CenterHorizontally),
                 ) {
-                    ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
                     Text(
                         text = it[page].name,
                         fontSize = 20.sp,
@@ -100,6 +101,8 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel, movieR
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 8.dp)
                     )
+                    ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+
                 }
             }
         }
@@ -192,8 +195,8 @@ fun ExoPlayerView(uri: String) {
             }
         },
         modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(start = 16.dp)
+            .fillMaxSize()
+            .then(Modifier
+               ),
     )
 }
