@@ -1,5 +1,7 @@
 package com.example.m7019e
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -92,10 +94,12 @@ fun ReviewItem(review: Review) {
         Column(
             modifier = Modifier
                 .width(400.dp)
-                .height(400.dp)
+                .height(600.dp)
                 .padding(16.dp)
                 .padding(top=24.dp)
                 .verticalScroll(rememberScrollState())
+                .border(width = 3.dp, color = Color.Black)
+                .padding(16.dp)
         ) {
             Row(){
                 Text(
@@ -104,6 +108,7 @@ fun ReviewItem(review: Review) {
                     color = Color.Black,
                     textAlign = TextAlign.Left
                 )
+                Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = review.rating.toString(),
                     fontSize = 20.sp,
@@ -115,13 +120,14 @@ fun ReviewItem(review: Review) {
                     contentDescription = null,
                     tint = Color.Yellow,
                     modifier = Modifier
-                        .padding(left, 8.dp)
+                        .padding(start = 8.dp)
                         .size(24.dp)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = review.content,
-                fontSize = 20.sp,
+                fontSize = 16.sp,
                 color = Color.Black,
                 textAlign = TextAlign.Left
             )
