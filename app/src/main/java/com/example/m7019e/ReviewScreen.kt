@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,33 +57,25 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
         modifier = Modifier
             .verticalScroll(rememberScrollState()),
     ) {
-        LazyHorizontalGrid(
-            rows = GridCells.Fixed(2),
+        Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-
+                .padding(10.dp)
+                .horizontalScroll(rememberScrollState()),
         ) {
-            reviews?.let {
-                items(reviews) { review ->
-                    ReviewItem(review)
-                }
+            reviews?.forEach { review ->
+                ReviewItem(review)
             }
-
 
         }
-        LazyHorizontalGrid(
-            rows = GridCells.Fixed(1),
+        Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(10.dp)
+                .horizontalScroll(rememberScrollState()),
 
         ) {
-            item() {
-                ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
-            }
+            ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
         }
     }
 }
@@ -96,7 +89,7 @@ fun ReviewItem(review: Review) {
 
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .width(400.dp)
                 .height(400.dp)
@@ -104,34 +97,35 @@ fun ReviewItem(review: Review) {
                 .padding(top=24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            /*
+            Row(){
+                Text(
+                    text = review.author,
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = review.rating.toString(),
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    textAlign = TextAlign.Left
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.star),
+                    contentDescription = null,
+                    tint = Color.Yellow,
+                    modifier = Modifier
+                        .padding(left, 8.dp)
+                        .size(24.dp)
+                )
+            }
             Text(
-                text = review.author,
+                text = review.content,
                 fontSize = 20.sp,
                 color = Color.Black,
                 textAlign = TextAlign.Left
             )
-
-            Text(
-                text = review.created_at,
-                fontSize = 20.sp,
-                color = Color.Black,
-                textAlign = TextAlign.Left
-            )
-            Text(
-                text = review.rating.toString(),
-                fontSize = 20.sp,
-                color = Color.Black,
-                textAlign = TextAlign.Left
-            )
-
-                */
-        Text(
-            text = review.content,
-            fontSize = 20.sp,
-            color = Color.Black,
-            textAlign = TextAlign.Left
-        )}
+        }
 
     }
 }
