@@ -112,7 +112,7 @@ class MovieResponse{ //Takes api response and converts it to a list of movies
                 Review(
                     author = reviewJson.getString("author"),
                     content = reviewJson.getString("content"),
-                    rating = "%.1f".format(reviewJson.getDouble("rating")).toFloat(),
+                    rating = "%.1f".format(reviewJson.getJSONObject("author_details").getDouble("rating")).toFloat(),
                     created_at = reviewJson.getString("created_at")
                 )
             )

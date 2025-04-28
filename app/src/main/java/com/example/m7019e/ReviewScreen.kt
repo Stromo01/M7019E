@@ -1,6 +1,7 @@
 package com.example.m7019e
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,44 +45,50 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.m7019e.api.Movie
 import com.example.m7019e.api.MovieResponse
+import com.example.m7019e.api.Review
 
 @Composable
 fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
                  movieResponse: MovieResponse,) {
     val context = LocalContext.current
     val reviews = viewModel.selectedMovie?.let { movieResponse.getReviews(it) }
-    LazyHorizontalGrid(
-        rows = GridCells.Fixed(1),
+    Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-
+            .verticalScroll(rememberScrollState()),
     ) {
-        reviews?.let {
-            items(reviews) { review ->
-                ReviewItem(review)
+        LazyHorizontalGrid(
+            rows = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+
+        ) {
+            reviews?.let {
+                items(reviews) { review ->
+                    ReviewItem(review)
+                }
             }
+
+
         }
+        LazyHorizontalGrid(
+            rows = GridCells.Fixed(1),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
 
-
-    }
-    LazyHorizontalGrid(
-        rows = GridCells.Fixed(1),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-
-    ) {
-        item(){
-            //ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+        ) {
+            item() {
+                ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+            }
         }
     }
 }
 
 @Composable
-fun ReviewItem(review: String) {
+fun ReviewItem(review: Review) {
 
     Column(
         modifier = Modifier
@@ -97,12 +104,35 @@ fun ReviewItem(review: String) {
                 .padding(top=24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            /*
+            Text(
+                text = review.author,
+                fontSize = 20.sp,
+                color = Color.Black,
+                textAlign = TextAlign.Left
+            )
+
+            Text(
+                text = review.created_at,
+                fontSize = 20.sp,
+                color = Color.Black,
+                textAlign = TextAlign.Left
+            )
+            Text(
+                text = review.rating.toString(),
+                fontSize = 20.sp,
+                color = Color.Black,
+                textAlign = TextAlign.Left
+            )
+
+                */
         Text(
-            text = review,
+            text = review.content,
             fontSize = 20.sp,
             color = Color.Black,
             textAlign = TextAlign.Left
         )}
+
     }
 }
 
