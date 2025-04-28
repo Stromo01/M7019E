@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -53,13 +54,14 @@ import coil.compose.AsyncImage
 import com.example.m7019e.api.Movie
 import com.example.m7019e.api.MovieResponse
 import com.example.m7019e.api.Review
+import com.example.m7019e.api.Video
 
 @Composable
-fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
-                 movieResponse: MovieResponse,) {
+fun ReviewScreen(navController: NavController, viewModel: MovieViewModel, movieResponse: MovieResponse) {
     val context = LocalContext.current
     val reviews = viewModel.selectedMovie?.let { movieResponse.getReviews(it) }
     val videos = viewModel.selectedMovie?.let { movieResponse.getVideos(it) }
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState()),
@@ -73,27 +75,26 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
             reviews?.forEach { review ->
                 ReviewItem(review)
             }
-
         }
-        Column(
+
+        LazyRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp)
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-                videos?.take(5)?.forEach { video ->
-                    Column(){
-                        ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
-                        Text(
-                            text=video.name,
-                            fontSize = 20.sp,
-                            color = Color.Black,
-                            textAlign = TextAlign.Left
-                        )
-                    }
+            items(videos?.take(5) ?: listOf<Video>()) { video ->
+                Column {
+                    Text(
+                        text = video.name,
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                        textAlign = TextAlign.Left
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
                 }
-            
-
-
+            }
         }
     }
 }
@@ -152,37 +153,31 @@ fun ReviewItem(review: Review) {
     }
 }
 
-
 @Composable
 fun ExoPlayerView(uri: String) {
-    // Get the current context
     val context = LocalContext.current
 
-    // Initialize ExoPlayer
+    // Retain the ExoPlayer instance across recompositions
     val exoPlayer = remember {
-        ExoPlayer.Builder(context).build()
-    }
-
-    // Create a MediaSource
-    val mediaSource = remember(uri) {
-        MediaItem.fromUri(uri)
-    }
-
-    // Set MediaSource to ExoPlayer
-    LaunchedEffect(mediaSource) {
-        exoPlayer.setMediaItem(mediaSource)
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = false // Start playback automatically
-    }
-
-    // Manage lifecycle events
-    DisposableEffect(Unit) {
-        onDispose {
-            exoPlayer.release() // Release ExoPlayer when the Composable is removed
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(uri))
+            prepare()
         }
     }
 
-    // Use AndroidView to embed an Android View (PlayerView) into Compose
+    // Start playback when the Composable is active
+    LaunchedEffect(exoPlayer) {
+        exoPlayer.playWhenReady = false
+    }
+
+    // Release the ExoPlayer instance when the Composable is removed
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+
+    // Embed the PlayerView in Compose
     AndroidView(
         factory = { ctx ->
             PlayerView(ctx).apply {
@@ -191,8 +186,7 @@ fun ExoPlayerView(uri: String) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp) // Set your desired height
-            .padding(start=16.dp)
+            .height(200.dp)
+            .padding(start = 16.dp)
     )
 }
-
