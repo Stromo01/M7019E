@@ -78,7 +78,7 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
                 .padding(10.dp)
         ) {
             item(){
-                videos?.forEach { video ->
+                videos?.take(5)?.forEach { video ->
                     ExoPlayerView(video)
                 }
             }
