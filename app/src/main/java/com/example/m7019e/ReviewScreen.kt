@@ -25,6 +25,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -77,22 +79,27 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel, movieR
             }
         }
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(videos?.take(5) ?: listOf<Video>()) { video ->
-                Column {
+        videos?.let {
+            val pagerState = rememberPagerState(initialPage = 0, pageCount = { it.size })
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+            ) { page ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
                     Text(
-                        text = video.name,
+                        text = it[page].name,
                         fontSize = 20.sp,
                         color = Color.Black,
-                        textAlign = TextAlign.Left
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
                 }
             }
         }
