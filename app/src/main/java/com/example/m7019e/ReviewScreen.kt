@@ -74,8 +74,6 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(10.dp)
-                .horizontalScroll(rememberScrollState()),
-
         ) {
             ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
         }
