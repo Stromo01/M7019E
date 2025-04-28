@@ -1,5 +1,8 @@
 package com.example.m7019e
 
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -77,11 +80,21 @@ fun ReviewScreen(navController: NavController, viewModel: MovieViewModel,
                 .fillMaxSize()
                 .padding(10.dp)
         ) {
+
             item(){
                 videos?.take(5)?.forEach { video ->
-                    ExoPlayerView(video)
+                    Column(){
+                        ExoPlayerView("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+                        Text(
+                            text=video.name,
+                            fontSize = 20.sp,
+                            color = Color.Black,
+                            textAlign = TextAlign.Left
+                        )
+                    }
                 }
             }
+
 
         }
     }
@@ -141,6 +154,7 @@ fun ReviewItem(review: Review) {
     }
 }
 
+
 @Composable
 fun ExoPlayerView(uri: String) {
     // Get the current context
@@ -160,7 +174,7 @@ fun ExoPlayerView(uri: String) {
     LaunchedEffect(mediaSource) {
         exoPlayer.setMediaItem(mediaSource)
         exoPlayer.prepare()
-        exoPlayer.playWhenReady = true // Start playback automatically
+        exoPlayer.playWhenReady = false // Start playback automatically
     }
 
     // Manage lifecycle events
