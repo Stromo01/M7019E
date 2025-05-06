@@ -130,7 +130,7 @@ fun ReviewItem(review: Review) {
             Row(){
                 Text(
                     text = review.author,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     color = Color.Black,
                     textAlign = TextAlign.Left
                 )
@@ -172,11 +172,6 @@ fun ExoPlayerView(uri: String) {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
         }
-    }
-
-    // Start playback when the Composable is active
-    LaunchedEffect(exoPlayer) {
-        exoPlayer.playWhenReady = false
     }
 
     // Release the ExoPlayer instance when the Composable is removed
