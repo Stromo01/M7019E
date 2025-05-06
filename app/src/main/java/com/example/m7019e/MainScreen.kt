@@ -36,19 +36,26 @@ import com.example.m7019e.api.MovieResponse
 
 
 @Composable
-fun MainScreen(navController: NavHostController, viewModel: MovieViewModel,
-               movieResponse: MovieResponse, favMovie: FavoriteMovieHandler) {
-    var category by remember { mutableStateOf("popular") }
+fun MainScreen(
+    navController: NavHostController,
+    viewModel: MovieViewModel,
+    movieResponse: MovieResponse,
+    favMovie: FavoriteMovieHandler,
+    initialCategory: String,
+    onCategoryChange: (String) -> Unit
+) {
+    var category by remember { mutableStateOf(initialCategory) } // Start with the initial category
 
     val movies: List<Movie> = if (category == "favorites") {
-        movieResponse.getFavoriteMovies(favMovie.getFavoriteMovieIds()) // Fetches favorite movies using the IDs
+        movieResponse.getFavoriteMovies(favMovie.getFavoriteMovieIds())
     } else {
-        movieResponse.getMovies(category) // Fetches movies based on the selected category
+        movieResponse.getMovies(category)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Banner(currentCategory = category) { selected ->    // Gets the selected category
+        Banner(currentCategory = category) { selected ->
             category = selected
+            onCategoryChange(selected) // Notify the parent of the category change
         }
         DisplayMovies(movies, navController, viewModel)
     }
