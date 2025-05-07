@@ -6,7 +6,7 @@ class FavoriteMovieHandler(private val context: Context) {
     private val jsonParser = JsonParser(context)
 
     fun addFavoriteMovie(movieId: String) {
-        if (!jsonParser.parseMovieJson().contains(movieId)) {
+        if (!jsonParser.parseMovieJson().any { it.id == movieId }) {
             jsonParser.addMovieToFile(movieId)
         }
     }
@@ -16,10 +16,10 @@ class FavoriteMovieHandler(private val context: Context) {
     }
 
     fun getFavoriteMovieIds(): List<String> {
-        return jsonParser.parseMovieJson()
+        return jsonParser.parseMovieJson().map { it.id }
     }
 
     fun isFavorite(movieId: String): Boolean {
-        return jsonParser.parseMovieJson().contains(movieId)
+        return jsonParser.parseMovieJson().any { it.id == movieId }
     }
 }
