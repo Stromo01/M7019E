@@ -13,6 +13,6 @@ interface MovieDao {
     @Query("DELETE FROM movies WHERE category = :category")
     suspend fun deleteMoviesByCategory(category: String)
 
-    @Query("SELECT * FROM movies WHERE category = :category")
+    @Query("SELECT * FROM movies WHERE category = :category ORDER BY orderIndex ASC")
     suspend fun getMoviesByCategory(category: String): List<MovieEntity>
 }

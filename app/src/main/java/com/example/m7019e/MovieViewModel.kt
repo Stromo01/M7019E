@@ -30,7 +30,7 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val movies = movieResponse.getMovies(category)
-                cacheMoviesByCategory(category, movies.map { it.toEntity(category) })
+                cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
             } catch (e: Exception) {
                 // Handle error (e.g., no internet)
             }

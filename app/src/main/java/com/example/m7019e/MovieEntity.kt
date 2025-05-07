@@ -10,5 +10,6 @@ data class MovieEntity(
     val overview: String,
     val poster_path: String,
     val rating: Float,
-    val category: String
+    val category: String,
+    val orderIndex: Int
 )

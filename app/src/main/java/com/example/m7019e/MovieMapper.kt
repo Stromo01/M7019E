@@ -4,14 +4,15 @@ import com.example.m7019e.api.MovieResponse
 import com.example.m7019e.api.Movie
 import com.example.m7019e.MovieEntity
 
-fun Movie.toEntity(category: String): MovieEntity {
+fun Movie.toEntity(category: String, orderIndex: Int): MovieEntity {
     return MovieEntity(
         id = this.id,
         title = this.title,
         overview = this.overview,
         poster_path = this.poster_path,
         rating = this.rating,
-        category = category
+        category = category,
+        orderIndex = orderIndex
     )
 }
 
