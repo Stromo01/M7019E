@@ -113,7 +113,7 @@ fun MovieItem(movie: Movie, navController: NavController, viewModel: MovieViewMo
     Column(
         modifier = Modifier
             .padding(8.dp).clickable {
-                viewModel.selectedMovie = movie
+                viewModel.selectedMovie.value = movie
                 navController.navigate("movie_detail")
             }
             .fillMaxSize(),

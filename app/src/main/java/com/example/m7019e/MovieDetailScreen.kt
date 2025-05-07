@@ -39,9 +39,12 @@ import com.example.m7019e.api.MovieResponse
 fun MovieDetailScreen(navController: NavController, viewModel: MovieViewModel,
                       movieResponse: MovieResponse, favMovie: FavoriteMovieHandler) {
     val context = LocalContext.current
-    val movie = viewModel.selectedMovie?.let { movieResponse.getMovieDetails(it) }
+    val selectedMovie = viewModel.selectedMovie.value // Observe the LiveData
 
-    movie?.let {
+    selectedMovie?.let { movie ->
+        val movieDetails = movieResponse.getMovieDetails(movie)
+
+        movieDetails?.let {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -170,4 +173,4 @@ fun MovieDetailScreen(navController: NavController, viewModel: MovieViewModel,
             }
         }
     }
-}
+}}
