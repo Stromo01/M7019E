@@ -26,25 +26,43 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
             movieDao.insertMovies(movies)
         }
     }
+    fun cacheFavouriteMovies(favouriteMovies: List<MovieEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            movieDao.insertMovies(favouriteMovies)
+        }
+    }
     fun fetchMovies(category: String, movieResponse: MovieResponse) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val movies = movieResponse.getMovies(category)
+                var movies = movieResponse.getMovies(category)
                 cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
             } catch (e: Exception) {
                 // Handle error (e.g., no internet)
             }
+
         }
     }
-    fun getMovies(category: String, movieResponse: MovieResponse, callback: (List<Movie>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val movies = try {
-                fetchMovies(category, movieResponse)
-                movieResponse.getMovies(category)
+
+     suspend fun fetchFavourites( category: String,favoriteIds: List<String>, movieResponse: MovieResponse): List<Movie>  {
+            return try {
+                val movies = movieResponse.getFavoriteMovies(favoriteIds)
+                cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
+                movies
             } catch (e: Exception) {
                 getCachedMoviesByCategory(category).map { it.toDomain() }
             }
-            callback(movies)
+        }
+
+    suspend fun clearCachedMovies() {
+        movieDao.clearAllMovies() // Ensure this clears all cached movies
+    }
+    suspend fun getMovies(category: String, movieResponse: MovieResponse): List<Movie> {
+        return try {
+            val movies = movieResponse.getMovies(category)
+            cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
+            movies
+        } catch (e: Exception) {
+            getCachedMoviesByCategory(category).map { it.toDomain() }
         }
     }
     suspend fun getCachedMoviesByCategory(category: String): List<MovieEntity> {

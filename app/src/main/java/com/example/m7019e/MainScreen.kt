@@ -50,18 +50,20 @@ fun MainScreen(
     var category by remember { mutableStateOf(initialCategory) } // Start with the initial category
     var movies by remember { mutableStateOf(emptyList<Movie>()) }
     LaunchedEffect(category) {
-        if (category == "favorites") {
-            val favoriteIds = favMovie.getFavoriteMovieIds()
-            movies = movieResponse.getFavoriteMovies(favoriteIds)
-        } else {
-            // Fetch movies for other categories
-            val cachedMovies = viewModel.getCachedMoviesByCategory(category).map { it.toDomain() }
-            if (cachedMovies.isNotEmpty()) {
-                movies = cachedMovies
-            } else {
-                viewModel.fetchMovies(category, movieResponse)
-            }
-        }
+        viewModel.fetchMovies(category, movieResponse)
+        movies = viewModel.getMovies(category, movieResponse)
+          if(isNetworkAvailable == true){
+              viewModel.clearCachedMovies()
+              if(category == "favorites"){
+                  val favoriteIds = favMovie.getFavoriteMovieIds()
+                  movies = viewModel.fetchFavourites(category,favoriteIds,movieResponse)
+              }else{
+                  movies = viewModel.getMovies(category, movieResponse)
+              }
+          }else{
+              movies = viewModel.getCachedMoviesByCategory(category).map { it.toDomain() }
+          }
+
     }
 
     Column(modifier = Modifier.fillMaxSize()) {

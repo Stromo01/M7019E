@@ -15,4 +15,8 @@ interface MovieDao {
 
     @Query("SELECT * FROM movies WHERE category = :category ORDER BY orderIndex ASC")
     suspend fun getMoviesByCategory(category: String): List<MovieEntity>
+
+    @Query("DELETE FROM movies")
+    suspend fun clearAllMovies()
+
 }
