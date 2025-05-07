@@ -75,7 +75,8 @@ class MainActivity : ComponentActivity() {
                                     initialCategory = currentCategory, // Pass the current category
                                     onCategoryChange = { selectedCategory ->
                                         currentCategory = selectedCategory // Update the category
-                                    }
+                                    },
+                                    isNetworkAvailable = isNetworkAvailable
                                 )
                             }
                             composable("movie_detail") {
@@ -83,7 +84,8 @@ class MainActivity : ComponentActivity() {
                                     navController = navController,
                                     viewModel = movieViewModel,
                                     movieResponse = movieResponse,
-                                    favMovie = favMovie
+                                    favMovie = favMovie,
+                                    isNetworkAvailable = isNetworkAvailable
                                 )
                             }
                             composable("review") {
@@ -133,6 +135,7 @@ class MainActivity : ComponentActivity() {
             if (cachedMovies.isNotEmpty()) {
                 // Display cached movies
                 DisplayMovies(
+                    isNetworkAvailable = isNetworkAvailable,
                     movies = cachedMovies,
                     navController = rememberNavController(),
                     viewModel = viewModel
@@ -147,7 +150,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.no_wifi),
-                        contentDescription = "No Internet",
+                        contentDescription = "No cached movies",
                         tint = Color.Gray,
                         modifier = Modifier.fillMaxSize(0.3f)
                     )
@@ -181,7 +184,7 @@ class MainActivity : ComponentActivity() {
                     imdbid = ""
                 ),
             )
-            DisplayMovies(sampleMovies, rememberNavController(), movieViewModel)
+            DisplayMovies(isNetworkAvailable, sampleMovies, rememberNavController(), movieViewModel)
             Banner(
                 currentCategory = "popular",
                 onCategorySelected = { /* Placeholder for preview */ }
