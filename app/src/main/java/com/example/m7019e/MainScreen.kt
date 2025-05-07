@@ -49,17 +49,8 @@ fun MainScreen(
     var movies by remember { mutableStateOf(emptyList<Movie>()) }
     LaunchedEffect(category) {
         if (category == "favorites") {
-            // Fetch favorite movie IDs from FavoriteMovieHandler
             val favoriteIds = favMovie.getFavoriteMovieIds()
-
-            // Fetch all cached movies and filter by favorite IDs
-            val allCachedMovies = viewModel.getCachedMoviesByCategory("popular") +
-                    viewModel.getCachedMoviesByCategory("top_rated")
-            val favoriteMovies = allCachedMovies
-                .filter { favoriteIds.contains(it.id.toString()) }
-                .map { it.toDomain() }
-
-            movies = favoriteMovies
+            movies = movieResponse.getFavoriteMovies(favoriteIds)
         } else {
             // Fetch movies for other categories
             val cachedMovies = viewModel.getCachedMoviesByCategory(category).map { it.toDomain() }
