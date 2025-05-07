@@ -1,71 +1,11 @@
 package com.example.m7019e
 
-import android.app.Application
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
 import com.example.m7019e.api.Movie
-import com.example.m7019e.api.MovieResponse
 
-class MovieViewModel(application: Application) : AndroidViewModel(application) {
-    private val movieDao = AppDatabase.getDatabase(application).movieDao()
-
-    var selectedMovie = mutableStateOf<Movie?>(null)
-        private set
-
-    fun selectMovie(movie: Movie) {
-        selectedMovie.value = movie
-    }
-
-    fun cacheMoviesByCategory(category: String, movies: List<MovieEntity>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            movieDao.deleteMoviesByCategory(category)
-            movieDao.insertMovies(movies)
-        }
-    }
-    fun cacheFavouriteMovies(favouriteMovies: List<MovieEntity>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            movieDao.insertMovies(favouriteMovies)
-        }
-    }
-    fun fetchMovies(category: String, movieResponse: MovieResponse) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                var movies = movieResponse.getMovies(category)
-                cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
-            } catch (e: Exception) {
-                // Handle error (e.g., no internet)
-            }
-
-        }
-    }
-
-     suspend fun fetchFavourites( category: String,favoriteIds: List<String>, movieResponse: MovieResponse): List<Movie>  {
-            return try {
-                val movies = movieResponse.getFavoriteMovies(favoriteIds)
-                cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
-                movies
-            } catch (e: Exception) {
-                getCachedMoviesByCategory(category).map { it.toDomain() }
-            }
-        }
-
-    suspend fun clearCachedMovies() {
-        movieDao.clearAllMovies() // Ensure this clears all cached movies
-    }
-    suspend fun getMovies(category: String, movieResponse: MovieResponse): List<Movie> {
-        return try {
-            val movies = movieResponse.getMovies(category)
-            cacheMoviesByCategory(category, movies.mapIndexed { index, movie -> movie.toEntity(category, index) })
-            movies
-        } catch (e: Exception) {
-            getCachedMoviesByCategory(category).map { it.toDomain() }
-        }
-    }
-    suspend fun getCachedMoviesByCategory(category: String): List<MovieEntity> {
-        return movieDao.getMoviesByCategory(category)
-    }
+class MovieViewModel : ViewModel() {
+    var selectedMovie by mutableStateOf<Movie?>(null)
 }
