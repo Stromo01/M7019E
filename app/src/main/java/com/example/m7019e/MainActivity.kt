@@ -1,6 +1,9 @@
 package com.example.m7019e
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,7 +38,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize NetworkConnectionHandler
+        // Initialize FavoriteMovieHandler
+        favMovie = FavoriteMovieHandler(this)
+
+        // Check for network availability
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+        isNetworkAvailable = networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+
+        // Initialize NetworkConnectionHandler to listen for changes
         networkConnectionHandler = NetworkConnectionHandler(
             context = this,
             onNetworkAvailable = { isNetworkAvailable = true },
@@ -43,10 +55,7 @@ class MainActivity : ComponentActivity() {
         )
         networkConnectionHandler.startListening()
 
-        // Initialize FavoriteMovieHandler
-        favMovie = FavoriteMovieHandler(this)
-
-        // Set up the UI
+        // Set up the UI based on network availability
         setupUI()
     }
 
