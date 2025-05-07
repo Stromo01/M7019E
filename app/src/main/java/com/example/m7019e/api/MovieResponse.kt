@@ -86,7 +86,7 @@ class MovieResponse{ //Takes api response and converts it to a list of movies
             id = jsonObject.getInt("id"),
             title = jsonObject.getString("title"),
             overview = jsonObject.getString("overview"),
-            poster_path = jsonObject.optString("poster_path", ""),
+            poster_path = jsonObject.getString("poster_path"),
             rating = "%.1f".format(jsonObject.getDouble("vote_average")).toFloat(),
             homepage = jsonObject.optString("homepage", ""),
             imdbid = jsonObject.optString("imdb_id", ""),

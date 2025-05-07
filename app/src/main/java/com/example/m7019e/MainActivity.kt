@@ -84,8 +84,7 @@ class MainActivity : ComponentActivity() {
                                     initialCategory = currentCategory, // Pass the current category
                                     onCategoryChange = { selectedCategory ->
                                         currentCategory = selectedCategory // Update the category
-                                    },
-                                    isNetworkAvailable = isNetworkAvailable
+                                    }
                                 )
                             }
                             composable("movie_detail") {
@@ -93,8 +92,7 @@ class MainActivity : ComponentActivity() {
                                     navController = navController,
                                     viewModel = movieViewModel,
                                     movieResponse = movieResponse,
-                                    favMovie = favMovie,
-                                    isNetworkAvailable = isNetworkAvailable
+                                    favMovie = favMovie
                                 )
                             }
                             composable("review") {
@@ -110,8 +108,7 @@ class MainActivity : ComponentActivity() {
                             currentCategory = currentCategory, // Pass the current category
                             onCategorySelected = { selectedCategory ->
                                 currentCategory = selectedCategory // Update the category
-                            },
-                            viewModel = movieViewModel
+                            }
                         )
                     }
                 }
@@ -122,17 +119,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun NoInternetScreen(
         currentCategory: String,
-        onCategorySelected: (String) -> Unit,
-        viewModel: MovieViewModel
-
+        onCategorySelected: (String) -> Unit
     ) {
-        var cachedMovies by remember { mutableStateOf(emptyList<Movie>()) }
-
-
-        LaunchedEffect(currentCategory) {
-            cachedMovies = viewModel.getCachedMoviesByCategory(currentCategory).map { it.toDomain() }
-        }
-
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -141,29 +129,18 @@ class MainActivity : ComponentActivity() {
             Banner(currentCategory = currentCategory, onCategorySelected = onCategorySelected)
 
             // No internet icon
-            if (cachedMovies.isNotEmpty()) {
-                // Display cached movies
-                DisplayMovies(
-                    isNetworkAvailable = isNetworkAvailable,
-                    movies = cachedMovies,
-                    navController = rememberNavController(),
-                    viewModel = viewModel
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.no_wifi),
+                    contentDescription = "No Internet",
+                    tint = Color.Gray,
+                    modifier = Modifier.fillMaxSize(0.3f)
                 )
-            } else {
-                // No cached movies message
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.no_wifi),
-                        contentDescription = "No cached movies",
-                        tint = Color.Gray,
-                        modifier = Modifier.fillMaxSize(0.3f)
-                    )
-                }
             }
         }
     }
@@ -193,7 +170,7 @@ class MainActivity : ComponentActivity() {
                     imdbid = ""
                 ),
             )
-            DisplayMovies(isNetworkAvailable, sampleMovies, rememberNavController(), movieViewModel)
+            DisplayMovies(sampleMovies, rememberNavController(), movieViewModel)
             Banner(
                 currentCategory = "popular",
                 onCategorySelected = { /* Placeholder for preview */ }
