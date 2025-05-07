@@ -99,7 +99,8 @@ class MainActivity : ComponentActivity() {
                             currentCategory = currentCategory, // Pass the current category
                             onCategorySelected = { selectedCategory ->
                                 currentCategory = selectedCategory // Update the category
-                            }
+                            },
+                            viewModel = movieViewModel
                         )
                     }
                 }
@@ -110,8 +111,17 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun NoInternetScreen(
         currentCategory: String,
-        onCategorySelected: (String) -> Unit
+        onCategorySelected: (String) -> Unit,
+        viewModel: MovieViewModel
+
     ) {
+        var cachedMovies by remember { mutableStateOf(emptyList<Movie>()) }
+
+
+        LaunchedEffect(currentCategory) {
+            cachedMovies = viewModel.getCachedMoviesByCategory(currentCategory).map { it.toDomain() }
+        }
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -120,18 +130,28 @@ class MainActivity : ComponentActivity() {
             Banner(currentCategory = currentCategory, onCategorySelected = onCategorySelected)
 
             // No internet icon
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.no_wifi),
-                    contentDescription = "No Internet",
-                    tint = Color.Gray,
-                    modifier = Modifier.fillMaxSize(0.3f)
+            if (cachedMovies.isNotEmpty()) {
+                // Display cached movies
+                DisplayMovies(
+                    movies = cachedMovies,
+                    navController = rememberNavController(),
+                    viewModel = viewModel
                 )
+            } else {
+                // No cached movies message
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.no_wifi),
+                        contentDescription = "No Internet",
+                        tint = Color.Gray,
+                        modifier = Modifier.fillMaxSize(0.3f)
+                    )
+                }
             }
         }
     }

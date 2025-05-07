@@ -22,6 +22,7 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
     fun cacheMoviesByCategory(category: String, movies: List<MovieEntity>) {
         viewModelScope.launch(Dispatchers.IO) {
+            movieDao.deleteMoviesByCategory(category)
             movieDao.insertMovies(movies)
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +46,14 @@ fun MainScreen(
     onCategoryChange: (String) -> Unit
 ) {
     var category by remember { mutableStateOf(initialCategory) } // Start with the initial category
-
-    val movies: List<Movie> = if (category == "favorites") {
-        movieResponse.getFavoriteMovies(favMovie.getFavoriteMovieIds())
-    } else {
-        movieResponse.getMovies(category)
+    var movies by remember { mutableStateOf(emptyList<Movie>()) }
+    LaunchedEffect(category) {
+        val cachedMovies = viewModel.getCachedMoviesByCategory(category).map { it.toDomain() }
+        if (cachedMovies.isNotEmpty()) {
+            movies = cachedMovies
+        } else {
+            viewModel.fetchMovies(category, movieResponse)
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
