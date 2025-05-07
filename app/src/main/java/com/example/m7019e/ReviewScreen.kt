@@ -59,11 +59,26 @@ import com.example.m7019e.api.MovieResponse
 import com.example.m7019e.api.Review
 import com.example.m7019e.api.Video
 
+
 @Composable
 fun ReviewScreen(navController: NavController, viewModel: MovieViewModel, movieResponse: MovieResponse) {
     val context = LocalContext.current
-    val reviews = viewModel.selectedMovie?.let { movieResponse.getReviews(it) }
-    val videos = viewModel.selectedMovie?.let { movieResponse.getVideos(it) }
+    val selectedMovie = viewModel.selectedMovie.value
+    if (selectedMovie == null) {
+        Text(
+            text = "No movie selected",
+            fontSize = 20.sp,
+            color = Color.Gray,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            textAlign = TextAlign.Center
+        )
+        return
+    }
+
+    val reviews = movieResponse.getReviews(selectedMovie)  ?: emptyList()
+    val videos = movieResponse.getVideos(selectedMovie)
 
     Column(
         modifier = Modifier

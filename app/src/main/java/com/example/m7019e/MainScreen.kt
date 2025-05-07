@@ -1,5 +1,6 @@
 package com.example.m7019e
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,14 +44,26 @@ fun MainScreen(
     movieResponse: MovieResponse,
     favMovie: FavoriteMovieHandler,
     initialCategory: String,
-    onCategoryChange: (String) -> Unit
+    onCategoryChange: (String) -> Unit,
+    isNetworkAvailable: Boolean
 ) {
     var category by remember { mutableStateOf(initialCategory) } // Start with the initial category
+    var movies by remember { mutableStateOf(emptyList<Movie>()) }
+    LaunchedEffect(category) {
+        viewModel.fetchMovies(category, movieResponse)
+        movies = viewModel.getMovies(category, movieResponse)
+          if(isNetworkAvailable == true){
+              viewModel.clearCachedMovies()
+              if(category == "favorites"){
+                  val favoriteIds = favMovie.getFavoriteMovieIds()
+                  movies = viewModel.fetchFavourites(category,favoriteIds,movieResponse)
+              }else{
+                  movies = viewModel.getMovies(category, movieResponse)
+              }
+          }else{
+              movies = viewModel.getCachedMoviesByCategory(category).map { it.toDomain() }
+          }
 
-    val movies: List<Movie> = if (category == "favorites") {
-        movieResponse.getFavoriteMovies(favMovie.getFavoriteMovieIds())
-    } else {
-        movieResponse.getMovies(category)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -57,7 +71,7 @@ fun MainScreen(
             category = selected
             onCategoryChange(selected) // Notify the parent of the category change
         }
-        DisplayMovies(movies, navController, viewModel)
+        DisplayMovies(isNetworkAvailable, movies, navController, viewModel)
     }
 }
 
@@ -92,7 +106,8 @@ fun Banner(
 }
 
 @Composable
-fun DisplayMovies(movies: List<Movie>,
+fun DisplayMovies(isNetworkAvailable: Boolean,
+                  movies: List<Movie>,
                   navController: NavController,
                   viewModel: MovieViewModel) {
     LazyVerticalGrid(
@@ -103,18 +118,23 @@ fun DisplayMovies(movies: List<Movie>,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(movies) { movie ->
-            MovieItem(movie, navController, viewModel)
+            MovieItem(isNetworkAvailable ,movie, navController, viewModel)
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie, navController: NavController, viewModel: MovieViewModel) {
+fun MovieItem(isNetworkAvailable: Boolean, movie: Movie, navController: NavController, viewModel: MovieViewModel) {
     Column(
         modifier = Modifier
             .padding(8.dp).clickable {
-                viewModel.selectedMovie = movie
-                navController.navigate("movie_detail")
+                viewModel.selectedMovie.value = movie
+                if(!isNetworkAvailable){
+                    Toast.makeText(navController.context, "No Internet Connection", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    navController.navigate("movie_detail")
+                }
             }
             .fillMaxSize(),
 

@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id("com.google.devtools.ksp")
+
 }
 
 android {
@@ -65,5 +66,14 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.2.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    val room_version = "2.7.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("androidx.room:room-rxjava2:$room_version")
+    implementation("androidx.room:room-rxjava3:$room_version")
+    implementation("androidx.room:room-guava:$room_version")
+    testImplementation("androidx.room:room-testing:$room_version")
+    implementation("androidx.room:room-paging:$room_version")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
 }
