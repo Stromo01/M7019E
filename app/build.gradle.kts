@@ -75,4 +75,5 @@ dependencies {
     testImplementation("androidx.room:room-testing:$room_version")
     implementation("androidx.room:room-paging:$room_version")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 }
